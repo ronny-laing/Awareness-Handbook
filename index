@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>珍芯晴芳香學院 - 生命靈數與花晶覺察日記 | Self-Awareness App</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- html2pdf for exporting PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- XLSX Library for exporting Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FAF4F2',
+              100: '#F4E2DE',
+              200: '#E8C7BF',
+              300: '#D9A99D',
+              400: '#C88878',
+              500: '#B26756',
+              600: '#944E3F',
+              700: '#7A3D31',
+              800: '#5C4D44', // 品牌主色可可棕
+              900: '#3A2E28',
+            },
+            flower: {
+              light: '#FFD166',  // 神聖之光 (1, 5)
+              heart: '#EF476F',  // 覺醒之心 (2, 6)
+              key: '#06D6A0',    // 財富之鑰 (3, 7)
+              smooth: '#118AB2', // 氣脈舒暢 (4, 8)
+              balance: '#8338EC' // 任督調和 (8, 9)
+            }
+          },
+          fontFamily: {
+            serif: ['"Noto Serif TC"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF4F2;
+      color: #3A2E28;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .serif {
+      font-family: 'Noto Serif TC', serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(232, 199, 191, 0.45);
+    }
+    .brand-gradient {
+      background: linear-gradient(135deg, #F4E2DE 0%, #E8C7BF 50%, #D9A99D 100%);
+    }
+    .btn-primary {
+      background-color: #5C4D44;
+      color: #FFFFFF;
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background-color: #3A2E28;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header / Navigation Bar -->
+  <header class="sticky top-0 z-50 glass-card border-b border-brand-200/50 px-4 lg:px-8 py-2.5">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <!-- 珍芯晴芳香學院 Logo (嵌入 SVG/靜態圖片與雙備援) -->
+        <a href="https://www.cistusaroma.com/index.php?route=product/category&path=86_87" target="_blank" class="flex items-center space-x-2 hover:opacity-90 transition">
+          <div id="logoContainer" class="h-12 lg:h-14 flex items-center justify-center">
+            <img id="mainLogoImg" src="logo透明底.png" alt="珍芯晴芳香學院" class="h-12 lg:h-14 w-auto object-contain drop-shadow-sm" onerror="handleLogoError(this)">
+          </div>
+        </a>
+        <div class="hidden sm:block border-l border-brand-200 pl-3">
+          <h1 class="text-base lg:text-lg font-bold font-serif text-brand-800 tracking-wide">生命靈數與花晶全息覺察</h1>
+          <p class="text-xs text-brand-600 font-medium">看見藍圖 ‧ 調頻覺察 ‧ 活出自我</p>
+        </div>
+      </div>
+
+      <!-- Mode Badge, Shop Link & User Auth Section -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Shop Link Button -->
+        <a href="https://www.cistusaroma.com/index.php?route=product/category&path=86_87" target="_blank" rel="noopener noreferrer" class="bg-rose-100 text-rose-800 hover:bg-rose-200 border border-rose-300 text-xs px-3 py-2 rounded-xl font-bold flex items-center space-x-1.5 transition shadow-sm">
+          <i class="fa-solid fa-cart-shopping text-rose-600"></i>
+          <span>線上花晶補貨</span>
+        </a>
+
+        <!-- Guest / Member Status Pill -->
+        <span id="statusBadge" class="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+          <i class="fa-solid fa-eye mr-1.5"></i> 訪客體驗模式
+        </span>
+
+        <!-- Auth Button -->
+        <button id="authBtn" onclick="toggleAuthModal()" class="btn-primary text-xs lg:text-sm px-3.5 py-2 rounded-xl shadow flex items-center space-x-1.5">
+          <i class="fa-solid fa-user-lock"></i>
+          <span id="authBtnText" class="hidden sm:inline">學員雲端登入</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="bg-white/70 border-b border-brand-100 px-4 py-2 sticky top-[65px] z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex justify-center space-x-2 md:space-x-6 text-sm font-semibold text-brand-800">
+      <button onclick="switchTab('calculator')" id="tab-calculator" class="px-3.5 py-2 rounded-xl bg-brand-100 text-brand-800 font-bold flex items-center space-x-1.5 transition">
+        <i class="fa-solid fa-calculator"></i>
+        <span>1. 靈數天賦藍圖</span>
+      </button>
+      <button onclick="switchTab('daily')" id="tab-daily" class="px-3.5 py-2 rounded-xl hover:bg-brand-50 text-brand-600 flex items-center space-x-1.5 transition">
+        <i class="fa-solid fa-pen-nib"></i>
+        <span>2. 每日花晶覺察日誌</span>
+      </button>
+      <button onclick="switchTab('monthly')" id="tab-monthly" class="px-3.5 py-2 rounded-xl hover:bg-brand-50 text-brand-600 flex items-center space-x-1.5 transition">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>3. 月度覺察報表</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-8">
+
+    <!-- ================= SECTION 1: LIFE PATH NUMBER CALCULATOR ================= -->
+    <section id="section-calculator" class="space-y-6">
+      <div class="glass-card rounded-2xl p-6 lg:p-8 shadow-sm border border-brand-200">
+        <div class="max-w-2xl mx-auto text-center space-y-4">
+          <span class="inline-block px-3 py-1 bg-brand-100 text-brand-700 text-xs font-bold rounded-full">全息靈數覺察</span>
+          <h2 class="text-2xl lg:text-3xl font-serif font-bold text-brand-800">輸入您的西元出生年月日</h2>
+          <p class="text-sm text-brand-600">靈數呈現我們天生的能量天賦與人生盲點，結合花晶調頻，協助我們找回身體與心靈的平衡力量。</p>
+          
+          <div class="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
+            <input type="date" id="birthdate" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-brand-300 focus:ring-2 focus:ring-brand-500 outline-none text-brand-800 bg-white shadow-sm font-medium">
+            <button onclick="calculateLifePath()" class="w-full sm:w-auto btn-primary px-6 py-2.5 rounded-xl font-bold flex items-center justify-center space-x-2 shadow-md">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>計算全息天賦數</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Card (Hidden by default) -->
+        <div id="calculatorResult" class="hidden mt-8 pt-8 border-t border-brand-200 transition-all">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            <!-- Number Display -->
+            <div class="brand-gradient rounded-2xl p-6 text-center flex flex-col justify-center items-center shadow-inner text-brand-800">
+              <p class="text-xs font-bold uppercase tracking-wider text-brand-700">Your Life Path Number</p>
+              <div id="resNum" class="text-6xl lg:text-7xl font-serif font-extrabold my-2">1</div>
+              <p id="resTitle" class="text-lg font-serif font-bold text-brand-800">開創號：獨立與領導天賦</p>
+            </div>
+
+            <!-- Insights & Blind Spots -->
+            <div class="md:col-span-2 space-y-4 flex flex-col justify-between">
+              <div class="bg-white/80 p-5 rounded-2xl border border-brand-100 space-y-3">
+                <h4 class="font-serif font-bold text-brand-800 text-base flex items-center">
+                  <i class="fa-solid fa-gem text-amber-500 mr-2"></i> 天賦優勢與潛能
+                </h4>
+                <p id="resTalent" class="text-sm text-brand-700 leading-relaxed"></p>
+              </div>
+
+              <div class="bg-amber-50/80 p-5 rounded-2xl border border-amber-200/60 space-y-3">
+                <h4 class="font-serif font-bold text-amber-900 text-base flex items-center">
+                  <i class="fa-solid fa-triangle-exclamation text-amber-600 mr-2"></i> 失衡盲點與習慣反應
+                </h4>
+                <p id="resBlindspot" class="text-sm text-amber-800 leading-relaxed"></p>
+              </div>
+
+              <div class="bg-rose-50/80 p-5 rounded-2xl border border-rose-200/60 space-y-3">
+                <div class="flex justify-between items-center">
+                  <h4 class="font-serif font-bold text-rose-900 text-base flex items-center">
+                    <i class="fa-solid fa-spa text-rose-500 mr-2"></i> 專屬花晶調頻指引
+                  </h4>
+                  <!-- Shop CTA Link -->
+                  <a href="https://www.cistusaroma.com/index.php?route=product/category&path=86_87" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-rose-700 underline hover:text-rose-900 flex items-center">
+                    <span>前往官網選購花晶</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[10px]"></i>
+                  </a>
+                </div>
+                <div id="resFlower" class="text-sm text-rose-800 font-medium"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 2: DAILY JOURNAL & FLORAL LOG ================= -->
+    <section id="section-daily" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Column: Form Controls -->
+        <div class="lg:col-span-2 glass-card rounded-2xl p-6 shadow-sm border border-brand-200 space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-brand-200 pb-4 gap-2">
+            <div>
+              <h2 class="text-xl font-serif font-bold text-brand-800">今日覺察與花晶日誌</h2>
+              <p class="text-xs text-brand-600">細緻覺察體感、調頻使用部位與五大場域指標</p>
+            </div>
+            <input type="date" id="journalDate" class="px-3 py-1.5 rounded-lg border border-brand-300 text-sm font-semibold bg-white text-brand-800">
+          </div>
+
+          <!-- 1. 花晶品項選擇 -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <label class="block text-sm font-bold text-brand-800">1. 今日使用的花晶品項 (可複選)</label>
+              <a href="https://www.cistusaroma.com/index.php?route=product/category&path=86_87" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-brand-600 hover:text-brand-800 underline">
+                <i class="fa-solid fa-bag-shopping mr-1"></i>官網花晶專區
+              </a>
+            </div>
+
+            <!-- 花晶品項與視覺化卡片 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label class="flex items-center p-3 rounded-xl border border-amber-200 bg-amber-50/40 hover:bg-amber-100/50 cursor-pointer transition">
+                <input type="checkbox" name="flowerItem" value="神聖之光" class="flower-checkbox rounded text-amber-600 focus:ring-amber-500 w-4 h-4" onchange="updateFlowerSelectorOptions()">
+                <div class="ml-2.5 flex items-center space-x-2">
+                  <span class="w-6 h-6 rounded-full bg-amber-300 text-amber-800 flex items-center justify-center text-xs font-bold shadow-sm">光</span>
+                  <span class="text-sm font-semibold text-brand-800">神聖之光 <span class="text-xs text-brand-500 font-normal">(1, 5 號)</span></span>
+                </div>
+              </label>
+
+              <label class="flex items-center p-3 rounded-xl border border-rose-200 bg-rose-50/40 hover:bg-rose-100/50 cursor-pointer transition">
+                <input type="checkbox" name="flowerItem" value="覺醒之心" class="flower-checkbox rounded text-rose-600 focus:ring-rose-500 w-4 h-4" onchange="updateFlowerSelectorOptions()">
+                <div class="ml-2.5 flex items-center space-x-2">
+                  <span class="w-6 h-6 rounded-full bg-rose-300 text-rose-800 flex items-center justify-center text-xs font-bold shadow-sm">心</span>
+                  <span class="text-sm font-semibold text-brand-800">覺醒之心 <span class="text-xs text-brand-500 font-normal">(2, 6 號)</span></span>
+                </div>
+              </label>
+
+              <label class="flex items-center p-3 rounded-xl border border-emerald-200 bg-emerald-50/40 hover:bg-emerald-100/50 cursor-pointer transition">
+                <input type="checkbox" name="flowerItem" value="財富之鑰" class="flower-checkbox rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4" onchange="updateFlowerSelectorOptions()">
+                <div class="ml-2.5 flex items-center space-x-2">
+                  <span class="w-6 h-6 rounded-full bg-emerald-300 text-emerald-800 flex items-center justify-center text-xs font-bold shadow-sm">鑰</span>
+                  <span class="text-sm font-semibold text-brand-800">財富之鑰 <span class="text-xs text-brand-500 font-normal">(3, 7 號)</span></span>
+                </div>
+              </label>
+
+              <label class="flex items-center p-3 rounded-xl border border-sky-200 bg-sky-50/40 hover:bg-sky-100/50 cursor-pointer transition">
+                <input type="checkbox" name="flowerItem" value="氣脈舒暢" class="flower-checkbox rounded text-sky-600 focus:ring-sky-500 w-4 h-4" onchange="updateFlowerSelectorOptions()">
+                <div class="ml-2.5 flex items-center space-x-2">
+                  <span class="w-6 h-6 rounded-full bg-sky-300 text-sky-800 flex items-center justify-center text-xs font-bold shadow-sm">氣</span>
+                  <span class="text-sm font-semibold text-brand-800">氣脈舒暢 <span class="text-xs text-brand-500 font-normal">(4, 8 號)</span></span>
+                </div>
+              </label>
+
+              <label class="flex items-center p-3 rounded-xl border border-purple-200 bg-purple-50/40 hover:bg-purple-100/50 cursor-pointer transition sm:col-span-2">
+                <input type="checkbox" name="flowerItem" value="任督調和" class="flower-checkbox rounded text-purple-600 focus:ring-purple-500 w-4 h-4" onchange="updateFlowerSelectorOptions()">
+                <div class="ml-2.5 flex items-center space-x-2">
+                  <span class="w-6 h-6 rounded-full bg-purple-300 text-purple-800 flex items-center justify-center text-xs font-bold shadow-sm">調</span>
+                  <span class="text-sm font-semibold text-brand-800">任督調和 <span class="text-xs text-brand-500 font-normal">(8, 9 號)</span></span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 2. 花晶使用部位 (改為勾選特定部位 + 自訂其他，可複選) -->
+          <div class="space-y-3 pt-2 border-t border-brand-200">
+            <label class="block text-sm font-bold text-brand-800">2. 花晶使用部位 (可複選)</label>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="頭頂/百會穴" class="rounded text-brand-700 mr-1.5">
+                <span>頭頂 / 百會穴</span>
+              </label>
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="太陽穴/三眼輪" class="rounded text-brand-700 mr-1.5">
+                <span>太陽穴 / 三眼輪</span>
+              </label>
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="喉輪/後頸肩頸" class="rounded text-brand-700 mr-1.5">
+                <span>喉輪 / 後頸肩頸</span>
+              </label>
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="胸口/心輪" class="rounded text-brand-700 mr-1.5">
+                <span>胸口 / 心輪</span>
+              </label>
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="太陽神經叢/上腹" class="rounded text-brand-700 mr-1.5">
+                <span>太陽神經叢 / 上腹</span>
+              </label>
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="臍輪/下腹肚臍" class="rounded text-brand-700 mr-1.5">
+                <span>臍輪 / 下腹肚臍</span>
+              </label>
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="海底輪/尾椎" class="rounded text-brand-700 mr-1.5">
+                <span>海底輪 / 尾椎</span>
+              </label>
+              <label class="flex items-center p-2 rounded-lg bg-white border border-brand-200 hover:bg-brand-50 cursor-pointer">
+                <input type="checkbox" name="bodyPart" value="四肢關節/脈搏" class="rounded text-brand-700 mr-1.5">
+                <span>四肢關節 / 脈搏</span>
+              </label>
+            </div>
+
+            <!-- 其他部位自訂輸入 -->
+            <div class="flex items-center space-x-2 pt-1">
+              <span class="text-xs font-semibold text-brand-700 shrink-0">其他補充部位：</span>
+              <input type="text" id="bodyPartOther" placeholder="如：膝蓋後方、後腰、全背部位等..." class="w-full px-3 py-1.5 rounded-xl border border-brand-300 text-xs outline-none focus:border-brand-500 bg-white">
+              <input type="text" id="flowerDose" placeholder="用量(如:3滴/塗抹2次)" class="w-36 px-3 py-1.5 rounded-xl border border-brand-300 text-xs outline-none focus:border-brand-500 bg-white shrink-0">
+            </div>
+          </div>
+
+          <!-- 3. 五大人生場域深度打分 (加入具體覺察指標引導) -->
+          <div class="space-y-5 pt-2 border-t border-brand-200">
+            <div class="flex justify-between items-center">
+              <label class="block text-sm font-bold text-brand-800">3. 五大人生場域狀態打分 (1分最低 / 10分最佳)</label>
+              <span class="text-[11px] text-brand-600">請根據下方提示做具體覺察</span>
+            </div>
+            
+            <div class="space-y-4">
+              <!-- Field 1: 財務與事業 -->
+              <div class="bg-white/70 p-3.5 rounded-xl border border-brand-200 space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold text-brand-800">
+                  <span class="flex items-center"><i class="fa-solid fa-coins text-amber-600 mr-1.5"></i> 財務與事業顯化 (行動力 / 天賦變現)</span>
+                  <span id="score-val-1" class="bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full font-bold">7 分</span>
+                </div>
+                <!-- 具體覺察引導條目 -->
+                <ul class="text-[11px] text-brand-600 grid grid-cols-2 gap-x-2 gap-y-1 bg-brand-50/60 p-2 rounded-lg">
+                  <li>• 今天對金錢是否有匱乏焦慮？</li>
+                  <li>• 是否勇敢展現自己的專業天賦？</li>
+                  <li>• 行動力是順暢還是拖延內耗？</li>
+                  <li>• 能否坦然接受金錢與豐盛流動？</li>
+                </ul>
+                <input type="range" min="1" max="10" value="7" id="score1" class="w-full accent-brand-800 cursor-pointer" oninput="document.getElementById('score-val-1').innerText = this.value + ' 分'">
+              </div>
+
+              <!-- Field 2: 工作與職場 -->
+              <div class="bg-white/70 p-3.5 rounded-xl border border-brand-200 space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold text-brand-800">
+                  <span class="flex items-center"><i class="fa-solid fa-briefcase text-blue-600 mr-1.5"></i> 工作與職場溝通 (界線與專業表達)</span>
+                  <span id="score-val-2" class="bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full font-bold">6 分</span>
+                </div>
+                <ul class="text-[11px] text-brand-600 grid grid-cols-2 gap-x-2 gap-y-1 bg-brand-50/60 p-2 rounded-lg">
+                  <li>• 能否明確表達個人觀點與界線？</li>
+                  <li>• 是否過度追求完美給自己大壓力？</li>
+                  <li>• 面對職場要求能否勇敢說不？</li>
+                  <li>• 與同事主管溝通是否順暢平穩？</li>
+                </ul>
+                <input type="range" min="1" max="10" value="6" id="score2" class="w-full accent-brand-800 cursor-pointer" oninput="document.getElementById('score-val-2').innerText = this.value + ' 分'">
+              </div>
+
+              <!-- Field 3: 人際與社交 -->
+              <div class="bg-white/70 p-3.5 rounded-xl border border-brand-200 space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold text-brand-800">
+                  <span class="flex items-center"><i class="fa-solid fa-users text-emerald-600 mr-1.5"></i> 人際與社交連結 (真實表達 / 減少討好)</span>
+                  <span id="score-val-3" class="bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full font-bold">8 分</span>
+                </div>
+                <ul class="text-[11px] text-brand-600 grid grid-cols-2 gap-x-2 gap-y-1 bg-brand-50/60 p-2 rounded-lg">
+                  <li>• 是否因害怕衝突而委屈討好？</li>
+                  <li>• 在人群中是否能維持自我中心？</li>
+                  <li>• 是否容易受他人的情緒與眼神影響？</li>
+                  <li>• 人際互動後感到被滋養還是被消耗？</li>
+                </ul>
+                <input type="range" min="1" max="10" value="8" id="score3" class="w-full accent-brand-800 cursor-pointer" oninput="document.getElementById('score-val-3').innerText = this.value + ' 分'">
+              </div>
+
+              <!-- Field 4: 家庭與親密 -->
+              <div class="bg-white/70 p-3.5 rounded-xl border border-brand-200 space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold text-brand-800">
+                  <span class="flex items-center"><i class="fa-solid fa-heart text-rose-600 mr-1.5"></i> 家庭與親密關係 (責任三分 / 照顧自己)</span>
+                  <span id="score-val-4" class="bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full font-bold">7 分</span>
+                </div>
+                <ul class="text-[11px] text-brand-600 grid grid-cols-2 gap-x-2 gap-y-1 bg-brand-50/60 p-2 rounded-lg">
+                  <li>• 是否過度幫家人承擔責任與情緒？</li>
+                  <li>• 是否有做好「責任三分法」？</li>
+                  <li>• 在伴侶/家庭關係中能否優先照顧好自己？</li>
+                  <li>• 是否心生怨懟覺得「都是我在付出」？</li>
+                </ul>
+                <input type="range" min="1" max="10" value="7" id="score4" class="w-full accent-brand-800 cursor-pointer" oninput="document.getElementById('score-val-4').innerText = this.value + ' 分'">
+              </div>
+
+              <!-- Field 5: 身心與情緒 -->
+              <div class="bg-white/70 p-3.5 rounded-xl border border-brand-200 space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold text-brand-800">
+                  <span class="flex items-center"><i class="fa-solid fa-spa text-purple-600 mr-1.5"></i> 身心與情緒調節 (鬆 / 衡 / 歸狀態)</span>
+                  <span id="score-val-5" class="bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full font-bold">7 分</span>
+                </div>
+                <ul class="text-[11px] text-brand-600 grid grid-cols-2 gap-x-2 gap-y-1 bg-brand-50/60 p-2 rounded-lg">
+                  <li>• 身體肩膀與肌肉是否處於緊繃狀態？</li>
+                  <li>• 是否能給自己時間靜心放空？</li>
+                  <li>• 呼吸是深長順暢還是淺短急促？</li>
+                  <li>• 情緒起伏後能否迅速找回內在中心？</li>
+                </ul>
+                <input type="range" min="1" max="10" value="7" id="score5" class="w-full accent-brand-800 cursor-pointer" oninput="document.getElementById('score-val-5').innerText = this.value + ' 分'">
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 文字覺察日記 (加入特定花晶選擇與引導) -->
+          <div class="space-y-3 pt-2 border-t border-brand-200">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+              <label class="block text-sm font-bold text-brand-800">4. 花晶事件感受與覺察筆記</label>
+              <!-- 選擇當下重點花晶 -->
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs font-semibold text-brand-700">本次重點觀察花晶：</span>
+                <select id="focusedFlowerSelect" class="px-2.5 py-1 rounded-lg border border-brand-300 text-xs bg-white text-brand-800 font-medium">
+                  <option value="通用全品項">-- 請選擇花晶 --</option>
+                  <option value="神聖之光">神聖之光</option>
+                  <option value="覺醒之心">覺醒之心</option>
+                  <option value="財富之鑰">財富之鑰</option>
+                  <option value="氣脈舒暢">氣脈舒暢</option>
+                  <option value="任督調和">任督調和</option>
+                </select>
+              </div>
+            </div>
+            
+            <p class="text-[11px] text-brand-600 bg-amber-50/80 p-2 rounded-lg border border-amber-200">
+              💡 <strong>覺察引導：</strong>今天發生了什麼具體事件？擦上花晶後，身體哪裡有熱感/酸麻/鬆開的體感？看見了自己什麼習慣性盲點，或做了什麼樣新的突破？
+            </p>
+            <textarea id="journalNote" rows="4" placeholder="請詳細記錄今日事件、身體體感與覺察盲點..." class="w-full p-3 rounded-xl border border-brand-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white"></textarea>
+          </div>
+
+          <!-- 5. 覺察宣言與執行期間提醒 -->
+          <div class="space-y-3 pt-2 border-t border-brand-200">
+            <label class="block text-sm font-bold text-brand-800">5. 今日覺察宣言 / 重新選擇</label>
+            <input type="text" id="journalAffirmation" placeholder="例如：我允許自己放鬆，我選擇把責任還給對方，照顧好自己。" class="w-full p-3 rounded-xl border border-brand-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+            
+            <!-- 新增：執行時間與複查週期選擇 -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-brand-50/80 p-3 rounded-xl border border-brand-200 gap-2">
+              <span class="text-xs font-bold text-brand-800 flex items-center">
+                <i class="fa-solid fa-clock text-amber-600 mr-1.5"></i> 預計持續執行與反覆複查期間：
+              </span>
+              <select id="affirmationDuration" class="w-full sm:w-auto px-3 py-1.5 rounded-lg border border-brand-300 text-xs bg-white text-brand-800 font-bold">
+                <option value="3天微習慣">3 天 (短期聚焦覺察)</option>
+                <option value="7天調頻期" selected>7 天 (一週深度調頻)</option>
+                <option value="14天突破期">14 天 (兩週盲點轉化)</option>
+                <option value="21天習慣養成">21 天 (三週重塑信念)</option>
+                <option value="30天月度復盤">30 天 (月度完整實現)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap gap-3 pt-4 border-t border-brand-200">
+            <button onclick="saveDailyJournal()" class="btn-primary flex-1 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 shadow-md">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span id="saveBtnLabel">儲存覺察日記</span>
+            </button>
+
+            <!-- Quick Export Options -->
+            <button onclick="exportSingleRecord('excel')" class="px-4 py-3 bg-emerald-700 text-white font-bold rounded-xl text-xs hover:bg-emerald-800 flex items-center space-x-1.5 shadow">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>匯出 Excel</span>
+            </button>
+            <button onclick="exportSingleRecord('doc')" class="px-4 py-3 bg-blue-700 text-white font-bold rounded-xl text-xs hover:bg-blue-800 flex items-center space-x-1.5 shadow">
+              <i class="fa-solid fa-file-word"></i>
+              <span>匯出 Word</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Quick Share & History Sidebar -->
+        <div class="space-y-6">
+          
+          <!-- Social / Padlet Share Helper Card -->
+          <div class="glass-card rounded-2xl p-5 border border-brand-200 space-y-4">
+            <div class="flex items-center space-x-2 text-brand-800 font-serif font-bold">
+              <i class="fa-solid fa-share-nodes text-brand-600"></i>
+              <h3>Padlet / 社群分享好幫手</h3>
+            </div>
+            <p class="text-xs text-brand-600 leading-relaxed">
+              梁老師鼓勵大家在課後 Padlet 或社群中相互同頻陪伴。點擊下方按鈕可將今日覺察自動格式化，一鍵複製！
+            </p>
+            <button onclick="copyPadletText()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl flex items-center justify-center space-x-2 shadow transition">
+              <i class="fa-regular fa-copy"></i>
+              <span>一鍵複製 Padlet 社群貼文格式</span>
+            </button>
+          </div>
+
+          <!-- Recent Logs Preview -->
+          <div class="glass-card rounded-2xl p-5 border border-brand-200 space-y-4">
+            <div class="flex justify-between items-center border-b border-brand-200 pb-2">
+              <h3 class="font-serif font-bold text-brand-800 text-sm">歷史覺察紀錄</h3>
+              <span id="logCount" class="text-xs text-brand-600 font-semibold">共 0 筆</span>
+            </div>
+            
+            <div id="historyLogsList" class="space-y-3 max-h-[400px] overflow-y-auto pr-1 text-xs">
+              <div class="text-center py-8 text-brand-500 italic">尚無紀錄，現在就開始您的第一天覺察吧！</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= SECTION 3: MONTHLY REPORT & ANALYTICS ================= -->
+    <section id="section-monthly" class="hidden space-y-6">
+      
+      <!-- Report Header -->
+      <div class="glass-card rounded-2xl p-6 shadow-sm border border-brand-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <span class="inline-block px-3 py-1 bg-brand-100 text-brand-700 text-xs font-bold rounded-full">數據轉化與成長</span>
+          <h2 class="text-2xl font-serif font-bold text-brand-800 mt-1">月度覺察報表與趨勢</h2>
+          <p class="text-xs text-brand-600">看見看懂，就能帶來轉變。呈現您的生命場域能量波動與花晶調頻頻率。</p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button onclick="generateMonthlyPDF()" class="btn-primary text-xs px-4 py-2.5 rounded-xl font-bold flex items-center space-x-2 shadow">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>一鍵導出 PDF 覺察月報</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable PDF Report Canvas Wrapper -->
+      <div id="monthlyReportPrintArea" class="space-y-6">
+        
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-brand-200 shadow-sm text-center">
+            <p class="text-xs text-brand-600 font-semibold">本月覺察天數</p>
+            <p id="statTotalDays" class="text-3xl font-serif font-bold text-brand-800 my-1">0 天</p>
+            <p class="text-[10px] text-brand-500">持續練習是蛻變的關鍵</p>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-brand-200 shadow-sm text-center">
+            <p class="text-xs text-brand-600 font-semibold">主要調頻花晶</p>
+            <p id="statTopFlower" class="text-xl font-serif font-bold text-brand-800 my-2">--</p>
+            <p class="text-[10px] text-brand-500">陪伴您最深的神聖能量</p>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-brand-200 shadow-sm text-center">
+            <p class="text-xs text-brand-600 font-semibold">平均身心與整體狀態</p>
+            <p id="statAvgScore" class="text-3xl font-serif font-bold text-amber-700 my-1">0 / 10</p>
+            <p class="text-[10px] text-brand-500">穩定提升中</p>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-2xl border border-brand-200 shadow-sm space-y-3">
+            <h3 class="font-serif font-bold text-brand-800 text-base flex items-center">
+              <i class="fa-solid fa-chart-pie text-brand-600 mr-2"></i> 五大人生場域平均能量雷達圖
+            </h3>
+            <div class="relative h-[280px] flex items-center justify-center">
+              <canvas id="radarChart"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-brand-200 shadow-sm space-y-3">
+            <h3 class="font-serif font-bold text-brand-800 text-base flex items-center">
+              <i class="fa-solid fa-chart-simple text-brand-600 mr-2"></i> 本月花晶使用頻率統計
+            </h3>
+            <div class="relative h-[280px] flex items-center justify-center">
+              <canvas id="barChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Qualitative Insight Summary -->
+        <div class="bg-amber-50/60 p-6 rounded-2xl border border-amber-200 space-y-3">
+          <h3 class="font-serif font-bold text-amber-900 text-base flex items-center">
+            <i class="fa-solid fa-feather-pointed text-amber-700 mr-2"></i> 梁老師陪伴小語與月度覺察總結
+          </h3>
+          <p id="monthlyAnalysisText" class="text-sm text-amber-900 leading-relaxed font-medium">
+            點擊「匯出 PDF 覺察月報」之前，請確認已有進行日誌紀錄。系統將自動分析您本月的場域波動與花晶體感，為您提供回顧建議。
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-brand-200 py-6 text-center text-xs text-brand-600 bg-white/40">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <p class="font-serif font-semibold">珍芯晴芳香學院 ‧ 梁老師生命靈數與花晶全息覺察體系 © 2026 All Rights Reserved.</p>
+      <p class="text-[11px] text-brand-500">本系統提供自我覺察與生活調頻記錄，非醫療處方行為。</p>
+    </div>
+  </footer>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="glass-card bg-white max-w-md w-full rounded-2xl p-6 shadow-2xl border border-brand-200 space-y-5">
+      <div class="flex justify-between items-center border-b border-brand-200 pb-3">
+        <h3 class="font-serif font-bold text-lg text-brand-800">學員登入 / 雲端備份模式</h3>
+        <button onclick="toggleAuthModal()" class="text-brand-500 hover:text-brand-800 text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="text-xs text-brand-600 leading-relaxed">
+        登入帳號後，您的覺察紀錄將安全儲存於雲端，方便您跨裝置（手機/電腦）登入與續寫。
+      </p>
+
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-brand-800 mb-1">學員電子郵件 (Email)</label>
+          <input type="email" id="authEmail" required placeholder="yourname@example.com" class="w-full p-2.5 rounded-xl border border-brand-300 text-sm outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-brand-800 mb-1">個人密碼 (Password)</label>
+          <input type="password" id="authPassword" required placeholder="••••••••" class="w-full p-2.5 rounded-xl border border-brand-300 text-sm outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <button type="submit" class="w-full btn-primary py-3 rounded-xl font-bold text-sm shadow">
+          登入 / 建立雲端帳號
+        </button>
+      </form>
+
+      <div class="text-center pt-2 border-t border-brand-100">
+        <button onclick="switchGuestMode()" class="text-xs text-brand-600 font-semibold underline hover:text-brand-800">
+          繼續使用一般公開訪客模式 (快速體驗)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-brand-800 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 border border-brand-600">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-amber-400"></i>
+    <span id="toastMsg" class="text-sm font-medium">訊息通知</span>
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+    // Global State
+    let currentUser = null;
+    let userJournals = [];
+    let currentLifePath = 1;
+
+    let radarChartInstance = null;
+    let barChartInstance = null;
+
+    // Logo Fallback Handler
+    function handleLogoError(imgEl) {
+      imgEl.onerror = null;
+      // SVG Fallback for Logo
+      const fallbackSvg = `
+        <div class="flex items-center space-x-2 bg-brand-50 p-2 rounded-xl border border-brand-200">
+          <div class="w-10 h-10 rounded-full bg-brand-800 text-white flex items-center justify-center font-serif font-bold text-lg">珍</div>
+          <div>
+            <div class="font-serif font-bold text-brand-800 text-sm leading-tight">珍芯晴芳香學院</div>
+            <div class="text-[10px] text-brand-600">Cistus Aroma Academy</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('logoContainer').innerHTML = fallbackSvg;
+    }
+
+    // Life Path Data Dictionary
+    const LIFE_PATH_DATA = {
+      1: {
+        title: "1號 開創號：獨立與領導天賦",
+        talent: "擁有極佳的開創力、獨立思考與領導天賦，自信且目標明確，能一馬當先開創新局。",
+        blindspot: "容易陷入單打獨鬥、給自己過大壓力，或因過度堅持主見而產生控制感與孤獨感。",
+        flower: "神聖之光（協助突破限制、給予自由勇氣、適度鬆開控制）"
+      },
+      2: {
+        title: "2號 協調號：敏銳與陪伴天賦",
+        talent: "具備極強的同理心、直覺力與協調天賦，懂得照顧他人感受，是溫暖的陪伴者。",
+        blindspot: "容易人際界線模糊、過度承擔他人情緒、討好委屈自己，害怕衝突與拒絕。",
+        flower: "覺醒之心（滋養自我愛、建立健康界線、減少委屈感）"
+      },
+      3: {
+        title: "3號 創意號：表達與顯化天賦",
+        talent: "充滿想像力、樂觀幽默，具備強大的表達力與靈感天賦，能帶來歡樂與變革。",
+        blindspot: "想法多但缺乏持續力，容易三分鐘熱度；遇到挫折時容易以幽默掩飾內心焦慮。",
+        flower: "財富之鑰（聚焦靈感、將天賦變現、穩固持續力）"
+      },
+      4: {
+        title: "4號 組織號：穩定與結構天賦",
+        talent: "務實縝密、追求條理與安全感，具備出色的執行力與建立系統架構的能力。",
+        blindspot: "過度追求完美與安全感，容易給自己過多框架、防禦心強，身心極易繃緊緊。",
+        flower: "氣脈舒暢（鬆開緊繃結構、釋放戒備與焦慮）"
+      },
+      5: {
+        title: "5號 自由號：突破與冒險天賦",
+        talent: "愛好自由、適應力極強、勇於跨界嘗試，具備強大的感染力與突破現狀勇氣。",
+        blindspot: "害怕被束縛，容易在自由與責任之間拉扯；焦躁時容易缺乏耐性與方向感。",
+        flower: "神聖之光（找到心靈真實自由、歸位並聚能量）"
+      },
+      6: {
+        title: "6號 關懷號：愛與療癒天賦",
+        talent: "天生富有大愛、責任感與美感，極具照顧、療癒與和諧家庭關係的天賦。",
+        blindspot: "容易過度付出、干涉他人人生課題（責任三分法沒做好），衍生不甘心與抱怨。",
+        flower: "覺醒之心（平衡給予與收受、先照顧好自己）"
+      },
+      7: {
+        title: "7號 探索號：洞察與智慧天賦",
+        talent: "具備深刻的邏輯思考、分析力與洞悉真相天賦，喜愛探索生命的本質與真理。",
+        blindspot: "過度理性思考而切斷感受；容易多疑、戒備心重，不易放開內心信任他人。",
+        flower: "財富之鑰（洞察真相、連結宇宙豐盛與信任）"
+      },
+      8: {
+        title: "8號 豐盛號：架構與變現天賦",
+        talent: "具備宏觀視野、組織整合與豐盛顯化天賦，能帶領團隊實現具體願景與價值。",
+        blindspot: "習慣把所有事情一個人「扛」起來，過度承擔壓力，忽視體能極限與情緒紓解。",
+        flower: "氣脈舒暢 + 任督調和（釋放重擔、回歸陰陽中心）"
+      },
+      9: {
+        title: "9號 人文號：慈悲與大愛天賦",
+        talent: "具備包容力、高精神境界與集大成智慧，熱心公益，渴望為社會帶來正向改變。",
+        blindspot: "容易過度向外追逐與討好，忽略自身內在需求；空有理想而缺乏落地腳踏實地。",
+        flower: "任督調和（找回中心、收斂能量回到自己）"
+      }
+    };
+
+    window.onload = function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('journalDate').value = today;
+      document.getElementById('birthdate').value = "1990-01-01";
+
+      loadLocalStorageData();
+      calculateLifePath();
+    };
+
+    function switchTab(tabName) {
+      const tabs = ['calculator', 'daily', 'monthly'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const sec = document.getElementById(`section-${t}`);
+        if (t === tabName) {
+          btn.className = "px-3.5 py-2 rounded-xl bg-brand-100 text-brand-800 font-bold flex items-center space-x-1.5 transition";
+          sec.classList.remove('hidden');
+        } else {
+          btn.className = "px-3.5 py-2 rounded-xl hover:bg-brand-50 text-brand-600 flex items-center space-x-1.5 transition";
+          sec.classList.add('hidden');
+        }
+      });
+
+      if (tabName === 'monthly') {
+        renderMonthlyReport();
+      }
+    }
+
+    function calculateLifePath() {
+      const birthStr = document.getElementById('birthdate').value;
+      if (!birthStr) return;
+
+      const digits = birthStr.replace(/-/g, '').split('').map(Number);
+      let sum = digits.reduce((a, b) => a + b, 0);
+
+      while (sum > 9) {
+        sum = sum.toString().split('').map(Number).reduce((a, b) => a + b, 0);
+      }
+
+      currentLifePath = sum === 0 ? 1 : sum;
+      const data = LIFE_PATH_DATA[currentLifePath];
+
+      document.getElementById('resNum').innerText = currentLifePath;
+      document.getElementById('resTitle').innerText = data.title;
+      document.getElementById('resTalent').innerText = data.talent;
+      document.getElementById('resBlindspot').innerText = data.blindspot;
+      document.getElementById('resFlower').innerText = data.flower;
+
+      document.getElementById('calculatorResult').classList.remove('hidden');
+    }
+
+    // 動態同步被勾選的花晶至覺察筆記下拉選單
+    function updateFlowerSelectorOptions() {
+      const checkedFlowers = Array.from(document.querySelectorAll('input[name="flowerItem"]:checked')).map(cb => cb.value);
+      const selectEl = document.getElementById('focusedFlowerSelect');
+      
+      selectEl.innerHTML = `<option value="通用全品項">-- 請選擇花晶 --</option>`;
+      
+      const allFlowers = ['神聖之光', '覺醒之心', '財富之鑰', '氣脈舒暢', '任督調和'];
+      allFlowers.forEach(f => {
+        const isChecked = checkedFlowers.includes(f);
+        const opt = document.createElement('option');
+        opt.value = f;
+        opt.innerText = isChecked ? `★ ${f} (今日使用)` : f;
+        selectEl.appendChild(opt);
+      });
+    }
+
+    // Save Daily Journal Entry
+    function saveDailyJournal() {
+      const date = document.getElementById('journalDate').value;
+      const flowers = Array.from(document.querySelectorAll('input[name="flowerItem"]:checked')).map(cb => cb.value);
+      
+      // 收集選取的部位與自訂部位
+      const selectedParts = Array.from(document.querySelectorAll('input[name="bodyPart"]:checked')).map(cb => cb.value);
+      const otherPart = document.getElementById('bodyPartOther').value.trim();
+      if (otherPart) selectedParts.push(`其他: ${otherPart}`);
+
+      const dose = document.getElementById('flowerDose').value;
+      const focusedFlower = document.getElementById('focusedFlowerSelect').value;
+
+      const scores = {
+        finance: parseInt(document.getElementById('score1').value),
+        work: parseInt(document.getElementById('score2').value),
+        relation: parseInt(document.getElementById('score3').value),
+        family: parseInt(document.getElementById('score4').value),
+        body: parseInt(document.getElementById('score5').value),
+      };
+
+      const note = document.getElementById('journalNote').value;
+      const affirmation = document.getElementById('journalAffirmation').value;
+      const duration = document.getElementById('affirmationDuration').value;
+
+      const entry = {
+        id: Date.now(),
+        date,
+        flowers,
+        focusedFlower,
+        bodyParts: selectedParts,
+        dose,
+        scores,
+        note,
+        affirmation,
+        duration,
+        lifePath: currentLifePath
+      };
+
+      const existingIdx = userJournals.findIndex(j => j.date === date);
+      if (existingIdx >= 0) {
+        userJournals[existingIdx] = entry;
+      } else {
+        userJournals.unshift(entry);
+      }
+
+      localStorage.setItem('liang_journals', JSON.stringify(userJournals));
+      updateHistoryUI();
+      showToast('覺察日記已成功儲存！');
+    }
+
+    function loadLocalStorageData() {
+      const stored = localStorage.getItem('liang_journals');
+      if (stored) {
+        userJournals = JSON.parse(stored);
+      }
+      updateHistoryUI();
+    }
+
+    function updateHistoryUI() {
+      const container = document.getElementById('historyLogsList');
+      document.getElementById('logCount').innerText = `共 ${userJournals.length} 筆`;
+
+      if (userJournals.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-brand-500 italic">尚無紀錄，現在就開始您的第一天覺察吧！</div>`;
+        return;
+      }
+
+      container.innerHTML = userJournals.map(j => `
+        <div class="bg-white p-3.5 rounded-xl border border-brand-200 shadow-sm space-y-1.5 hover:border-brand-400 transition">
+          <div class="flex justify-between items-center text-brand-800 font-bold">
+            <span>${j.date}</span>
+            <span class="text-[10px] px-2 py-0.5 bg-brand-100 text-brand-700 rounded-full font-semibold">${j.flowers.join(', ') || '一般覺察'}</span>
+          </div>
+          ${j.focusedFlower && j.focusedFlower !== '通用全品項' ? `<div class="text-[10px] font-bold text-rose-700">重點花晶：${j.focusedFlower}</div>` : ''}
+          <p class="text-brand-600 truncate">${j.note || '無文字紀錄'}</p>
+          ${j.affirmation ? `<div class="text-[10px] text-amber-800 bg-amber-50 p-1 rounded font-medium">宣言: ${j.affirmation} (${j.duration || '7天'})</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function copyPadletText() {
+      const date = document.getElementById('journalDate').value;
+      const flowers = Array.from(document.querySelectorAll('input[name="flowerItem"]:checked')).map(cb => cb.value).join('、');
+      const focused = document.getElementById('focusedFlowerSelect').value;
+      const note = document.getElementById('journalNote').value || '今日平靜覺察。';
+      const affirmation = document.getElementById('journalAffirmation').value || '照顧好自己，練習回到中心。';
+      const duration = document.getElementById('affirmationDuration').value;
+
+      const copyText = `🌸【珍芯晴芳香學院 - 覺察日記】
+📅 日期：${date}
+✨ 今日使用花晶：${flowers || '無'}
+🎯 深度覺察花晶：${focused}
+📝 覺察筆記與體感：
+${note}
+
+💡 今日覺察宣言與目標 (進行 ${duration})：
+「${affirmation}」
+#珍芯晴芳香學院 #生命靈數 #花晶覺察 #梁老師陪跑班`;
+
+      const el = document.createElement('textarea');
+      el.value = copyText;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+
+      showToast('已複製 Padlet 分享格式，可直接貼上至社群！');
+    }
+
+    function exportSingleRecord(type) {
+      const date = document.getElementById('journalDate').value;
+      const flowers = Array.from(document.querySelectorAll('input[name="flowerItem"]:checked')).map(cb => cb.value).join(', ');
+      
+      const selectedParts = Array.from(document.querySelectorAll('input[name="bodyPart"]:checked')).map(cb => cb.value);
+      const otherPart = document.getElementById('bodyPartOther').value.trim();
+      if (otherPart) selectedParts.push(`其他: ${otherPart}`);
+
+      const focused = document.getElementById('focusedFlowerSelect').value;
+      const dose = document.getElementById('flowerDose').value;
+      const note = document.getElementById('journalNote').value;
+      const affirmation = document.getElementById('journalAffirmation').value;
+      const duration = document.getElementById('affirmationDuration').value;
+
+      if (type === 'excel') {
+        const data = [{
+          "日期": date,
+          "使用花晶": flowers,
+          "重點觀察花晶": focused,
+          "使用部位": selectedParts.join(', '),
+          "用量頻率": dose,
+          "財務顯化": document.getElementById('score1').value,
+          "職場溝通": document.getElementById('score2').value,
+          "人際關係": document.getElementById('score3').value,
+          "家庭關係": document.getElementById('score4').value,
+          "身心狀態": document.getElementById('score5').value,
+          "事件與覺察": note,
+          "覺察宣言": affirmation,
+          "複查執行期間": duration
+        }];
+
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "單日覺察");
+        XLSX.writeFile(wb, `珍芯晴花晶覺察日記_${date}.xlsx`);
+        showToast('已匯出 Excel 檔！');
+
+      } else if (type === 'doc') {
+        const content = `
+          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+          <head><title>單日覺察紀錄</title></head>
+          <body style="font-family: Arial, sans-serif; padding:20px;">
+            <h2 style="color:#5C4D44;">珍芯晴芳香學院 - 花晶覺察日記 (${date})</h2>
+            <hr/>
+            <p><strong>使用花晶：</strong> ${flowers}</p>
+            <p><strong>重點觀察花晶：</strong> ${focused}</p>
+            <p><strong>使用部位：</strong> ${selectedParts.join(', ')}</p>
+            <p><strong>用量頻率：</strong> ${dose}</p>
+            <p><strong>事件與覺察：</strong></p>
+            <p style="background:#FAF4F2; padding:10px;">${note}</p>
+            <p><strong>覺察宣言：</strong> ${affirmation} (複查期間：${duration})</p>
+          </body>
+          </html>
+        `;
+        const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `珍芯晴花晶覺察日記_${date}.doc`;
+        a.click();
+        showToast('已匯出 Word 檔！');
+      }
+    }
+
+    function renderMonthlyReport() {
+      document.getElementById('statTotalDays').innerText = `${userJournals.length} 天`;
+      
+      if (userJournals.length === 0) {
+        document.getElementById('monthlyAnalysisText').innerText = "目前尚無歷史覺察紀錄，請先至第二頁進行每日覺察填寫。";
+        return;
+      }
+
+      let fSum=0, wSum=0, rSum=0, faSum=0, bSum=0;
+      const flowerCounts = {};
+
+      userJournals.forEach(j => {
+        fSum += j.scores.finance;
+        wSum += j.scores.work;
+        rSum += j.scores.relation;
+        faSum += j.scores.family;
+        bSum += j.scores.body;
+
+        j.flowers.forEach(f => {
+          flowerCounts[f] = (flowerCounts[f] || 0) + 1;
+        });
+      });
+
+      const len = userJournals.length;
+      const avgF = (fSum / len).toFixed(1);
+      const avgW = (wSum / len).toFixed(1);
+      const avgR = (rSum / len).toFixed(1);
+      const avgFa = (faSum / len).toFixed(1);
+      const avgB = (bSum / len).toFixed(1);
+
+      const totalAvg = ((parseFloat(avgF) + parseFloat(avgW) + parseFloat(avgR) + parseFloat(avgFa) + parseFloat(avgB)) / 5).toFixed(1);
+      document.getElementById('statAvgScore').innerText = `${totalAvg} / 10`;
+
+      let topFlower = "無";
+      let maxC = 0;
+      for (let f in flowerCounts) {
+        if (flowerCounts[f] > maxC) {
+          maxC = flowerCounts[f];
+          topFlower = f;
+        }
+      }
+      document.getElementById('statTopFlower').innerText = topFlower;
+
+      document.getElementById('monthlyAnalysisText').innerText = 
+        `本月您一共進行了 ${len} 天的覺察紀錄。陪伴您最頻繁的花晶是【${topFlower}】。在五大場域中，您的整體平均數值為 ${totalAvg} 分。特別在身心調節與人際溝通上展現出顯著的自我調整能力，繼續保持這份對內在的看見！`;
+
+      const radarCtx = document.getElementById('radarChart').getContext('2d');
+      if (radarChartInstance) radarChartInstance.destroy();
+
+      radarChartInstance = new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+          labels: ['財務顯化', '職場溝通', '人際關係', '家庭親密', '身心狀態'],
+          datasets: [{
+            label: '本月場域平均分數',
+            data: [avgF, avgW, avgR, avgFa, avgB],
+            backgroundColor: 'rgba(217, 169, 157, 0.4)',
+            borderColor: '#B26756',
+            pointBackgroundColor: '#5C4D44'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: { min: 0, max: 10 }
+          }
+        }
+      });
+
+      const barCtx = document.getElementById('barChart').getContext('2d');
+      if (barChartInstance) barChartInstance.destroy();
+
+      const flowerLabels = ['神聖之光', '覺醒之心', '財富之鑰', '氣脈舒暢', '任督調和'];
+      const flowerData = flowerLabels.map(l => flowerCounts[l] || 0);
+
+      barChartInstance = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: flowerLabels,
+          datasets: [{
+            label: '使用次數',
+            data: flowerData,
+            backgroundColor: ['#FFD166', '#EF476F', '#06D6A0', '#118AB2', '#8338EC']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+    }
+
+    function generateMonthlyPDF() {
+      const element = document.getElementById('monthlyReportPrintArea');
+      const opt = {
+        margin: 0.5,
+        filename: `珍芯晴花晶覺察月報.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+      showToast('正在生成 PDF 覺察月報，請稍候...');
+    }
+
+    function toggleAuthModal() {
+      document.getElementById('authModal').classList.toggle('hidden');
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      currentUser = { email };
+
+      document.getElementById('statusBadge').innerHTML = `<i class="fa-solid fa-cloud text-emerald-600 mr-1.5"></i> 雲端會員：${email.split('@')[0]}`;
+      document.getElementById('statusBadge').className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+      document.getElementById('authBtnText').innerText = "雲端已連線";
+
+      toggleAuthModal();
+      showToast('已成功登入！雲端同步模式已啟動。');
+    }
+
+    function switchGuestMode() {
+      currentUser = null;
+      document.getElementById('statusBadge').innerHTML = `<i class="fa-solid fa-eye mr-1.5"></i> 訪客體驗模式 (不留存雲端)`;
+      document.getElementById('statusBadge').className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200";
+      document.getElementById('authBtnText').innerText = "學員雲端登入";
+      toggleAuthModal();
+      showToast('已切換為一般公開訪客模式');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
